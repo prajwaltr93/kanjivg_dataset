@@ -21,15 +21,26 @@ min_x = 0
 min_y = 0
 WIDTH = 100
 HEIGHT = 100
+NUM_SEGMENTS = 6 # actual segments -= 1
+step = 0.2 # intecrement t in terms of
 
 # helper functions
 def offset(x,y):
     # offset x, y to move image horizontally and vertically
     return(x-offset_x, y-offset_y)
 
+def rem_dup(points):
+    # remove redundant adjacent points
+    se = []
+    for ind in range(len(points)-1):
+        if points[ind] != points[ind + 1]:
+            se.append(points[ind])
+    se.append(points[-1])
+    return se
+
 def write_stroke(point_list, write_fd):
     # remove duplicate cordinates
-    # point_list = list(set(point_list)) # TODO : REMOVE adjacent duplicate 
+    point_list = rem_dup(point_list) # REMOVE adjacent duplicate
     # write line (x,y) and (x1, y1) using M L commands
     write_fd.write(m_line % point_list[0]) # first is M command
     for point in point_list[1:]:
@@ -60,14 +71,13 @@ if __name__ == "__main__":
 
             for curve in curve_objects[1:]: # ignore fist M command
                 t = 0.0
-                for x in range(0,11): # 0.0 <= t <= 1.0
+                for x in range(0,6): # 0.0 <= t <= 1.0
                     p = curve.point(t)
                     points.append(offset(int(p.real), int(p.imag)))
-                    t += 0.1 # step
-            # write stroke
+                    t += 0.2 # step
+            # write individual stroke
             write_stroke(points, write_fd)
         # all strokes written
         write_fd.write("' fill='none' stroke='black' />\n")
         write_fd.write("</svg>")
         write_fd.close()
-        exit(0)
