@@ -81,3 +81,9 @@ if __name__ == "__main__":
         write_fd.write("' fill='none' stroke='black' />\n")
         write_fd.write("</svg>")
         write_fd.close()
+
+    # black list files ex : files with strokes outside viewbox or negative indices
+    from os import remove
+    files = ['05c03.svg', '05300.svg', '0006a.svg', '00070.svg', '09ec3.svg']
+    for file in files:
+        os.remove('kanji_modified/' + file)
