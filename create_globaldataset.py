@@ -6,10 +6,10 @@
 '''
     python script to create dataset for global model in paper "Teaching Robots to Draw"
 
-    USAGE :
-    $python create_globaldataset.py <sample_rate>
+    USAGE:
+        $python create_globaldataset.py train validation test
 
-    <sample_rate>  : integer number of files to consider for one dataset
+        train, validation, test - ratio to divide files'
 
     tip : use less sample rate for japanese characters ex : 90 or 100, for regualar characters sample rate of 300 works fine
 
@@ -79,9 +79,10 @@ def pickleDataset(dataset, ind, flag):
     #clear contents of dataset structure
     dataset['sG_data'] = []
     dataset['sG_labels'] = []
+    # exit(0)
 
 def createDataset(filelist, flag):
-    sample_rate = 300
+    sample_rate = 150
     breaks = [i for i in range(0, len(filelist), sample_rate)]
     for break_ind in range(len(breaks) - 1):
         for file in filelist[breaks[break_ind] : breaks[break_ind + 1]]:
@@ -109,12 +110,12 @@ def createDataset(filelist, flag):
                 # plotImages(str(index), X_loc_img, X_env_img, X_last_img, X_diff_img)
                 # data augementation
                 if flag == TRAIN:
-                    shift_x = ImageGen(width_shift = [-3, 3, 2])
-                    shift_x.flow([X_loc_img, X_env_img, X_last_img, X_diff_img, X_label_img])
-                    for X_loc_img, X_env_img, X_last_img, X_diff_img, X_label_img in shift_x:
+                    # shift_x = ImageGen(width_shift = [-3, 3, 2])
+                    # shift_x.flow([X_loc_img, X_env_img, X_last_img, X_diff_img, X_label_img])
+                    # for X_loc_img, X_env_img, X_last_img, X_diff_img, X_label_img in shift_x:
                         #update to dataset
-                        dataset['sG_data'].append(np.dstack((X_loc_img, X_env_img, X_last_img, X_diff_img)))
-                        dataset['sG_labels'].append(np.reshape(X_label_img, (HEIGHT * WIDTH)))
+                    dataset['sG_data'].append(np.dstack((X_loc_img, X_env_img, X_last_img, X_diff_img)))
+                    dataset['sG_labels'].append(np.reshape(X_label_img, (HEIGHT * WIDTH)))
                     # end of data augementation
                 if flag == TEST or flag == VALIDATION:
                     #update to dataset
@@ -151,6 +152,7 @@ if __name__ == "__main__":
     _, _, filelist = next(walk(traverse_path))
     filelist = sorted(filelist)
     ratio = int(len(filelist) // (train + validation + test))
+    print('number of files to traverse :\ntrain : %d\nvalidation : %d\ntest : %d' % (train * ratio, test * ratio, validation * ratio))
     # train dataset
     createDataset(filelist[ : train * ratio], TRAIN)
     # validation datset
