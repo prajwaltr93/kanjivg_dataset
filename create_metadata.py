@@ -31,9 +31,9 @@ def help():
     dataset - L -> Local Dataset \n \
               G -> Global Dataset \n \
               L1 -> Local Dataset minority class \n \
-    <test>, \n \
-    <test>, \n \
-    <train> - integer number of files to consider to count samples")
+    <train>, \n \
+    <validation>, \n \
+    <test> - integer number of files to consider to count samples")
     exit(0)
 
 if len(sys.argv) != 5:
@@ -97,9 +97,9 @@ if (train + validation + test) > len(filelist):
     exit(0)
 
 if sys.argv[1].lower() == 'g':
-    train_files = ["train_"prefix+i.__str__() for i in range(train)] #two files
-    validation_files = ["validation_"+prefix+(train+i).__str__() for i in range(validation)]
-    test_files = ["test_"+prefix+(train+validation+i).__str__() for i in range(test)]
+    train_files = ["train_" + prefix+i.__str__() for i in range(train)] #two files
+    validation_files = ["validation_"+prefix+(i).__str__() for i in range(validation)]
+    test_files = ["test_"+prefix+(i).__str__() for i in range(test)]
 if sys.argv[1].lower() == 'l' or sys.argv[1].lower() == 'l1':
     train_files = [prefix+i.__str__() for i in range(train)] #two files
     validation_files = [prefix+(train+i).__str__() for i in range(validation)]
@@ -111,6 +111,7 @@ traverse_values = ['train_samples', 'validation_samples', 'test_samples']
 for fold, fold_value in zip(traverse_list, traverse_values):
     temp_len = 0
     for file in fold:
+        print('current file : ', file)
         data = pic.load(open(path + file, 'rb'), encoding = 'bytes')
         temp_len += len(data[list(data.keys())[0]])
     metadata[fold_value] = temp_len
