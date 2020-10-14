@@ -23,9 +23,9 @@ LINE_TYPE = cv.LINE_AA
 path_re = re.compile(r'\t(.*)\n')
 points_re = re.compile(r'(\d+),\s(\d+)')
 test_dir_path = "./test_dir/"
-TEST = 1
+TEST = 2
 TRAIN = 0
-VALIDATION = 2
+VALIDATION = 1
 
 #debug functions
 def showImage(img):
