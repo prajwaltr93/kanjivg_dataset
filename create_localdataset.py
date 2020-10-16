@@ -116,10 +116,10 @@ if __name__ == "__main__":
     collect_minority = True if sys.argv[1] == "minority" else False # collect samples with touch = 0
     if collect_minority:
         sample_rate = 100
-        file_cap = 2000
+        file_cap = 6000
     else:
         sample_rate = 10
-        file_cap = 200
+        file_cap = 600
     _, _, filelist = next(walk(traverse_path))
     breaks = [i for i in range(0, len(filelist[:file_cap]), sample_rate)]
     for break_ind in range(len(breaks) - 1):
@@ -135,7 +135,10 @@ if __name__ == "__main__":
                 except: # out of index exception
                     stroke = X_target[m_indices[index] : ]
                 #all points for given stroke ML,MLL,MLLLL
-                points = getAllPoints(stroke)
+                try:
+                    points = getAllPoints(stroke)
+                except:
+                    continue # negative cordinates are not included in regex
                 env_l = []
                 diff_l = points
                 touch = 1
@@ -164,18 +167,20 @@ if __name__ == "__main__":
                         env_l = points[0 : ind + 2] # add two points for one complete stroke
                         diff_l = points[ind + 1 :]
                 if collect_minority:
-                    # update last instance
-                    touch = 0
-                    env_l = points
-                    diff_l = []
-                    current_xy = points[-1]
-                    # inputs
-                    # con_img
                     try:
+                        # update last instance
+                        touch = 0
+                        env_l = points
+                        diff_l = []
+                        current_xy = points[-1]
+                        # inputs
+                        # con_img
                         ext_inp = getSliceWindow(current_xy)
                         env_img = drawFromPoints(env_l)
                         diff_img = drawFromPoints(diff_l)
-                        # outputs
+                        # check if cordinates are valid by testing slicing at current_xy, if it does not return 5 * 5 image then discard
+                        getCroppedImage(current_xy, current_xy) # raises exception if 5 * 5 image is not generated
+                        # update dataset
                         next_xy_img = np.zeros((crop_img_size, crop_img_size)) # 5 * 5 empty image
                         dataset['lG_data'].append(np.dstack((env_img, diff_img, con_img)))
                         dataset['lG_extract'].append(ext_inp)

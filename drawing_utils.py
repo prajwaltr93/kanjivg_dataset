@@ -127,7 +127,7 @@ def getAllPoints(stroke):
     x1, y1 = parsePointString(stroke[-1])
     point_list += [[x1, y1]] #append last point
     # offset points to origin 0,0
-    # point_list = [offsetPoints(point) for point in point_list]
+    point_list = [tuple(point) for point in point_list]
     return point_list
 
 #point class
