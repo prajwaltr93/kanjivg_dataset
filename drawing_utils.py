@@ -12,6 +12,7 @@ import re
 import matplotlib.pyplot as plt
 import numpy as np
 from bresenhamsalgo import getPoints
+import copy as cp
 
 # globals
 WIDTH = 100
@@ -98,6 +99,17 @@ def getStrokesIndices(svg_string):
         if path[0] == 'M':
             m_indices.append(search_ind)
     return X_target, m_indices
+
+def drawFromPointsRetImage(points, img):
+    # copy image
+    img = cp.deepcopy(img)
+    #if points = empty then return blank image
+    if len(points) == 0:
+        return img
+    #else draw for each point
+    for ind in range(len(points) - 1):
+        cv.line(img, points[ind], points[ind + 1],COLOR, THICKNESS, LINE_TYPE)
+    return img
 
 def drawFromPoints(points):
     #if points = empty then return blank image
