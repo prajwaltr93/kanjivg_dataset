@@ -119,7 +119,7 @@ if __name__ == "__main__":
         file_cap = 6000
     else:
         sample_rate = 10
-        file_cap = 600
+        file_cap = 100
     _, _, filelist = next(walk(traverse_path))
     breaks = [i for i in range(0, len(filelist[:file_cap]), sample_rate)]
     for break_ind in range(len(breaks) - 1):
@@ -139,6 +139,13 @@ if __name__ == "__main__":
                     points = getAllPoints(stroke)
                 except:
                     continue # negative cordinates are not included in regex
+                env_stroke = X_target[0 : m_indices[index]]
+                try:
+                    diff_stroke = X_target[m_indices[index + 1] : ]
+                except:
+                    diff_stroke = []
+                env_canvas = drawStroke(env_stroke)
+                diff_canvas = drawStroke(diff_stroke)
                 env_l = []
                 diff_l = points
                 touch = 1
@@ -150,8 +157,8 @@ if __name__ == "__main__":
                         try:
                         # inputs
                             ext_inp = getSliceWindow(current_xy)
-                            env_img = drawFromPoints(env_l)
-                            diff_img = drawFromPoints(diff_l)
+                            env_img = drawFromPointsRetImage(env_l, env_canvas)
+                            diff_img = drawFromPointsRetImage(diff_l, diff_canvas)
                             # outputs
                             next_xy_img = getCroppedImage(next_xy, current_xy) # 5 * 5 image with one point drawn and cropped at current_xy
                             # plot images for verfication
@@ -176,12 +183,11 @@ if __name__ == "__main__":
                         # inputs
                         # con_img
                         ext_inp = getSliceWindow(current_xy)
-                        env_img = drawFromPoints(env_l)
-                        diff_img = drawFromPoints(diff_l)
-                        # check if cordinates are valid by testing slicing at current_xy, if it does not return 5 * 5 image then discard
-                        getCroppedImage(current_xy, current_xy) # raises exception if 5 * 5 image is not generated
+                        env_img = drawFromPointsRetImage(env_l, env_canvas)
+                        diff_img = drawFromPointsRetImage(diff_l, diff_canvas)
                         # update dataset
-                        next_xy_img = np.zeros((crop_img_size, crop_img_size)) # 5 * 5 empty image
+                        # check if cordinates are valid by testing slicing at current_xy, if it does not return 5 * 5 image then discard
+                        next_xy_img = getCroppedImage(current_xy, current_xy) # using defualt class
                         dataset['lG_data'].append(np.dstack((env_img, diff_img, con_img)))
                         dataset['lG_extract'].append(ext_inp)
                         dataset['lG_croppedimg'].append(np.reshape(next_xy_img, (crop_img_size * crop_img_size)))
