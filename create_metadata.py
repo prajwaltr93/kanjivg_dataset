@@ -20,11 +20,14 @@
 import sys
 from drawing_utils import *
 import pickle as pic
+import copy as cp
+from threading import Thread
 
 global_dataset_path = "./global_dataset/"
 local_dataset_path = "./local_dataset/"
 prefix_norm = 'data_batch_'
 prefix_minority = 'm_data_batch_'
+NUM_THREADS = 4
 
 def help():
     print("$python create_metadata.py <dataset> <train> <validation> <test> \n \
@@ -105,16 +108,34 @@ if sys.argv[1].lower() == 'l' or sys.argv[1].lower() == 'l1':
     validation_files = [prefix+(train+i).__str__() for i in range(validation)]
     test_files = [prefix+(train+validation+i).__str__() for i in range(test)]
 
-traverse_list = [train_files, validation_files, test_files]
 traverse_values = ['train_samples', 'validation_samples', 'test_samples']
 
-for fold, fold_value in zip(traverse_list, traverse_values):
-    temp_len = 0
-    for file in fold:
-        print('current file : ', file)
-        data = pic.load(open(path + file, 'rb'), encoding = 'bytes')
-        temp_len += len(data[list(data.keys())[0]])
-    metadata[fold_value] = temp_len
+def thread_traverse(traverse_list, traverse_values, metadata):
+
+    for fold, fold_value in zip(traverse_list, traverse_values):
+        temp_len = 0
+        for file in fold:
+            print('current file : ', file)
+            data = pic.load(open(path + file, 'rb'), encoding = 'bytes')
+            temp_len += len(data[list(data.keys())[0]])
+        metadata[fold_value] = temp_len
+    return metadata
+
+# deploy threads
+train_unit = len(train_files) // NUM_THREADS if (len(train_files) % 4 == 0 and len(train_files) > 4) else ((len(train_files) // NUM_THREADS + 1) if (len(train_files) > 4) else len(train_files))
+validation_unit = len(validation_files) // NUM_THREADS if (len(validation_files) % 4 == 0 and len(validation_files) > 4) else ((len(validation_files) // NUM_THREADS + 1) if (len(validation_files) > 4) else len(validation_files))
+test_unit = len(test_files) // NUM_THREADS if (len(test_files) % 4 == 0 and len(test_files) > 4) else ((len(test_files) // NUM_THREADS + 1) if (len(test_files) > 4) else len(test_files))
+
+thread_list = []
+for mul in range(NUM_THREADS):
+    traverse_list = [train_files[mul * train_unit : (mul + 1) * train_unit], validation_files[mul * validation_unit : (mul + 1) * validation_unit], test_files[mul * test_unit : (mul + 1) * test_unit]]
+    x = Thread(target = thread_traverse, args = (traverse_list, traverse_values, metadata))
+    x.start()
+    print("Thread %d covering train : %d validation %d test %d files" % (mul, len(traverse_list[0]), len(traverse_list[1]), len(traverse_list[2])))
+    thread_list.append(x)
+
+for thread in thread_list:
+    thread.join() # wait for each thread to finish
 
 # print generated metadata to output
 for key, item in metadata.items():
