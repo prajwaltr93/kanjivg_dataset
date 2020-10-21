@@ -27,7 +27,7 @@ global_dataset_path = "./global_dataset/"
 local_dataset_path = "./local_dataset/"
 prefix_norm = 'data_batch_'
 prefix_minority = 'm_data_batch_'
-NUM_THREADS = 4
+NUM_THREADS = 2
 
 def help():
     print("$python create_metadata.py <dataset> <train> <validation> <test> \n \
@@ -131,7 +131,7 @@ for mul in range(NUM_THREADS):
     traverse_list = [train_files[mul * train_unit : (mul + 1) * train_unit], validation_files[mul * validation_unit : (mul + 1) * validation_unit], test_files[mul * test_unit : (mul + 1) * test_unit]]
     x = Thread(target = thread_traverse, args = (traverse_list, traverse_values, metadata))
     x.start()
-    print("Thread %d covering train : %d validation %d test %d files" % (mul, len(traverse_list[0]), len(traverse_list[1]), len(traverse_list[2])))
+    print("Thread %d covering train : %d validation : %d test : %d files" % (mul, len(traverse_list[0]), len(traverse_list[1]), len(traverse_list[2])))
     thread_list.append(x)
 
 for thread in thread_list:
