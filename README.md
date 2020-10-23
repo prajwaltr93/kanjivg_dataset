@@ -22,3 +22,8 @@ Dataset for training models in teaching robots to draw
 5.**kanjivg_modified.tar.gz** --> compressed file with kanjivg modified characters (bezeir to line segment converted)
 
 6.**derprecated/** --> folder with python scripts which create pickled datasets (generates large datasets as much as 55GB or more depending on sample size, using python generator is much lighter and faster less I/O during training)
+
+
+### CREDIT
+
+All character in this repository are from [kanjivg webpage](http://kanjivg.tagaini.net/index.html) and used under Creative Commons Attribution-Share Alike 3.0 license. 
