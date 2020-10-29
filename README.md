@@ -9,6 +9,16 @@ Dataset for training models in teaching robots to draw
 
 3. few characters are removed because of in-compaitability reasons, will be restored in future commits
 
+## visualization of datasets
+
+Global Dataset
+
+![global dataset](./res/global_model_visualization.gif)
+
+Local Dataset
+
+![local dataset](./res/local_model_visualization.gif)
+
 ### scripts and their functions
 
 1.**bresenhamsalgo.py** --> this module has implementation for segmenting a given strait line
