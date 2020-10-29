@@ -11,8 +11,8 @@ import re
 # constants and magic numbers
 d_regex = re.compile(r'\sd="(.*)"/>') # find d attribute of path element
 traverse_path = './kanji/'
-offset_x = 5
-offset_y = 5
+offset_x = 4
+offset_y = 4
 out_path = './kanji_modified/'
 m_line = "\tM %d, %d\n"
 l_line = "\tL %d, %d\n"
