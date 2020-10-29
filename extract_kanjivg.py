@@ -21,8 +21,8 @@ min_x = 0
 min_y = 0
 WIDTH = 100
 HEIGHT = 100
-NUM_SEGMENTS = 6 # actual segments -= 1
-step = 0.2 # intecrement t in terms of
+NUM_SEGMENTS = 3 # actual segments -= 1
+step = 0.5 # intecrement t in terms of
 
 # helper functions
 def offset(x,y):
@@ -71,10 +71,10 @@ if __name__ == "__main__":
 
             for curve in curve_objects[1:]: # ignore fist M command
                 t = 0.0
-                for x in range(0,6): # 0.0 <= t <= 1.0
+                for x in range(0,NUM_SEGMENTS): # 0.0 <= t <= 1.0
                     p = curve.point(t)
                     points.append(offset(int(p.real), int(p.imag)))
-                    t += 0.2 # step
+                    t += step # step
             # write individual stroke
             write_stroke(points, write_fd)
         # all strokes written
