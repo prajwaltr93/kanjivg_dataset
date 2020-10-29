@@ -75,7 +75,12 @@ def checkFileCompaitability(filelist):
                 filelist_rem.append(file)
 
 if __name__ == "__main__":
-    import sys
     _, _, filelist = next(walk(traverse_path))
     checkFileCompaitability(filelist)
-    print("files lost : ",len(set(filelist_rem)))
+    print("number of files not compaitable : ",len(set(filelist_rem)))
+    print("press y to remove n to continue : ")
+    if input().lower() == 'y':
+        from os import remove
+        for file in set(filelist):
+            remove(traverse_path+file)
+            print("file removed : " + file)
