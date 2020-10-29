@@ -81,6 +81,6 @@ if __name__ == "__main__":
     print("press y to remove n to continue : ")
     if input().lower() == 'y':
         from os import remove
-        for file in set(filelist):
+        for file in set(filelist_rem):
             remove(traverse_path+file)
             print("file removed : " + file)
