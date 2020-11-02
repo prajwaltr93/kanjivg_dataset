@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from bresenhamsalgo import getPoints
 import copy as cp
+from random import randint
 
 # globals
 WIDTH = 100
@@ -181,8 +182,9 @@ class ImageGen:
     def __init__(self, width_shift = None, heigth_shift = None): # width_shift = [-x, +x, step]
         self.width_shift = range(width_shift[0], width_shift[1], width_shift[2]).__iter__() if width_shift else None
         self.heigth_shift = range(heigth_shift[0], heigth_shift[1], heigth_shift[2]).__iter__() if heigth_shift else None
-
+        # TODO : applying shear transformation
     def flow(self, imgs):
+        # images to apply transformation
         self.imgs = imgs
 
     def __iter__(self):
@@ -190,24 +192,14 @@ class ImageGen:
         return self
 
     def __next__(self):
-        # shift along x axis
-        if self.width_shift:
-            tx = next(self.width_shift)
-            rows,cols = self.imgs[0].shape
-            M = np.float32([[1,0,tx],[0,1,0]])
-            dst_images = []
-            for img in self.imgs:
-                dst = cv.warpAffine(img,M,(cols,rows))
-                dst_images.append(dst)
-            return dst_images
-
-        # shift along y axis
-        if self.heigth_shift:
-            ty = next(self.heigth_shift)
-            rows,cols = imgs[0].shape
-            M = np.float32([[1,0,ty],[0,1,0]])
-            dst_images = []
-            for img in self.imgs:
-                dst = cv.warpAffine(img,M,(cols,rows))
-                dst_images.append(dst)
-            return dst_images
+        tx = next(self.width_shift)
+        ty = next(self.heigth_shift)
+        itx = randint(0, 1)
+        ity = randint(0,1) if itx == 1 else 1
+        rows,cols = self.imgs[0].shape
+        M = np.float32([[1, 0, itx * tx],[0, 1, ity * ty]])
+        dst_images = []
+        for img in self.imgs:
+            dst = cv.warpAffine(img,M,(cols,rows))
+            dst_images.append(dst)
+        return dst_images
