@@ -12,7 +12,7 @@ from drawing_utils import *
 traverse_path = "./kanji_modified/"
 
 # Stroke generator, one sample at a time
-def strokeGenerator(filelist):
+def strokeGenerator(filelist, dataaug = False):
     for file in filelist:
         svg_string = open(traverse_path+file).read()
         X_target, m_indices = getStrokesIndices(svg_string)
@@ -36,6 +36,13 @@ def strokeGenerator(filelist):
             X_diff_img = drawStroke(X_diff)
             X_label_img = drawPoint(label)
             yield np.dstack((X_loc_img, X_env_img, X_last_img, X_diff_img)), np.reshape(X_label_img, (HEIGHT * WIDTH))
+            # configure image data augementation if specified
+            auggen = ImageGen(width_shift=[-2, 3, 1], heigth_shift=[-2, 3, 1]) if dataaug else None # 5
+            # get augmented images if configured
+            if auggen:
+                auggen.flow([X_loc_img, X_env_img, X_last_img, X_diff_img, X_label_img])
+                for X_loc_img, X_env_img, X_last_img, X_diff_img, X_label_img in auggen:
+                    yield np.dstack((X_loc_img, X_env_img, X_last_img, X_diff_img)), np.reshape(X_label_img, (HEIGHT * WIDTH))
             # udpate variables
             if (len(m_indices) == 1) or (index + 1 == len(m_indices)):
                 # X_target has only one stroke
