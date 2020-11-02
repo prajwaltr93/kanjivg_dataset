@@ -28,17 +28,18 @@ def help():
     print("USAGE : \n \
     $python visualise_dataset <dataset>\n \
     <dataset> - g - Global\n \
-                l - Local")
+                l - Local\n \
+                ga - Global Augmented")
     exit(0)
 
 #argument processing
-
 import sys
-
 argv = sys.argv
 
 if len(argv) != 2:
     help()
+
+# vanilla dataset visualization
 if argv[1].lower() == 'g':
     # plot and save global dataset
     from global_strokegenerator import strokeGenerator
@@ -60,6 +61,30 @@ if argv[1].lower() == 'g':
         axs[3].set_title("X_diff")
         axs[4].set_title("label")
         plt.savefig(global_dir_path + "sample" + str(ind) + ".png")
+
+# visualise dataset if it was augmented
+elif argv[1].lower() == 'ga':
+    # plot and save global dataset
+    from global_strokegenerator import strokeGenerator
+    sg = strokeGenerator(filelist, True)
+    for ind in range(samples):
+        img, label = next(sg)
+        #get label image
+        label = np.reshape(label, (HEIGHT, WIDTH))
+        img = np.transpose(img, (2,0,1))
+        _, axs = plt.subplots(1, 5)
+        axs[0].imshow(img[0], cmap="Greys_r")
+        axs[1].imshow(img[1], cmap="Greys_r")
+        axs[2].imshow(img[2], cmap="Greys_r")
+        axs[3].imshow(img[3], cmap="Greys_r")
+        axs[4].imshow(label, cmap="Greys_r")
+        axs[0].set_title("X_loc")
+        axs[1].set_title("X_env")
+        axs[2].set_title("X_last")
+        axs[3].set_title("X_diff")
+        axs[4].set_title("label")
+        plt.savefig(global_dir_path + "sample" + str(ind) + ".png")
+# local dataset visualization
 else:
     from local_strokegenerator import *
     lg = strokeGenerator(filelist)
