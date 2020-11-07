@@ -36,6 +36,15 @@ def showImage(img):
     cv.waitKey(0)
 
 # drawing utility functions
+def highlightPoints(points):
+    # mark white points on black background
+    img = np.zeros((HEIGHT, WIDTH))
+
+    for point in points:
+        img[point[1]][point[0]] = 1 # inverted x,y axis
+
+    return img
+    
 def parsePointString(point_string):
     #get x and y cordinate out of point_string
     result_points = points_re.search(point_string)
@@ -113,10 +122,14 @@ def drawFromPointsRetImage(points, img):
     return img
 
 def drawFromPoints(points):
-    #if points = empty then return blank image
+    # if points not in tuple described in tuple
+    if not points[0] == tuple():
+        points = cp.deepcopy(points)
+        points = [tuple(point) for point in points]
 
     img = np.zeros((HEIGHT, WIDTH))
 
+    #if points = empty then return blank image
     if len(points) == 0:
         return img
 
