@@ -37,7 +37,7 @@ def strokeGenerator(filelist, dataaug = False):
             X_label_img = drawPoint(label)
             yield np.dstack((X_loc_img, X_env_img, X_last_img, X_diff_img)), np.reshape(X_label_img, (HEIGHT * WIDTH))
             # configure image data augementation if specified
-            auggen = ImageGen(width_shift=[-2, 3, 1], heigth_shift=[-2, 3, 1]) if dataaug else None # 5
+            auggen = ImageGen(width_shift=[-2, 3, 1], heigth_shift=[-2, 3, 1]) if dataaug else None # 5 steps from -2 to 2 total of 5 augmented images applied randomly.
             # get augmented images if configured
             if auggen:
                 auggen.flow([X_loc_img, X_env_img, X_last_img, X_diff_img, X_label_img])

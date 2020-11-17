@@ -12,7 +12,7 @@ from drawing_utils import *
 
 # traverse_path = "/content/drive/My Drive/train_local_model/kanji_modified/"
 
-traverse_path = "./kanji_modified/"
+traverse_path = "/home/starkm42/kanjivg_dataset/kanji_modified/"
 
 def getSliceWindow(current_xy):
     '''
