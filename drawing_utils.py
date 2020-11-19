@@ -44,7 +44,7 @@ def highlightPoints(points):
         img[point[1]][point[0]] = 1 # inverted x,y axis
 
     return img
-    
+
 def parsePointString(point_string):
     #get x and y cordinate out of point_string
     result_points = points_re.search(point_string)
@@ -102,15 +102,20 @@ def drawStroke(strokes):
     return img
 
 def getStrokesIndices(svg_string):
-    #get path string
+    '''
+        get all M, L commands and collect index of each M command
+    '''
     X_target = path_re.findall(svg_string)
     m_indices = []
     for search_ind, path in zip(range(len(X_target)),X_target.__iter__()):
-        if path[0] == 'M':
+        if path[0] == 'M': # if command begins with M
             m_indices.append(search_ind)
     return X_target, m_indices
 
 def drawFromPointsRetImage(points, img):
+    '''
+        over write on existing image, used to retain changes made by previous commands drawn
+    '''
     # copy image
     img = cp.deepcopy(img)
     #if points = empty then return blank image
@@ -122,6 +127,9 @@ def drawFromPointsRetImage(points, img):
     return img
 
 def drawFromPoints(points):
+    '''
+        given points in list of x,y tuple, draw image using cv draw functions
+    '''
     # if points not in tuple described in tuple
     if not points[0] == tuple():
         points = cp.deepcopy(points)
@@ -143,6 +151,9 @@ def pointDiff(pointA, pointB):
     return [pointB[0] - pointA[0], pointB[1] - pointA[1]]
 
 def getAllPoints(stroke):
+    '''
+        segments given line stroke into points with interval difference in range[-2, 2] using bresenhams algorithm
+    '''
     #stroke = list of ML,MLL,MLLL
     point_list = []
     for ind in range(len(stroke) - 1):
@@ -190,7 +201,7 @@ class ImageGen:
         datagen = ImageGen(width_shift = [-5,5]) # use any one transformation at a time
         datagen.flow(imgs) # imgs is list of images to apply transformations on, all images should have same dimensions
 
-        datagen is iterator object, with __next__() method, for use in for loop
+        datagen is a iterator object, with __next__() method, for use in for loop
     '''
     def __init__(self, width_shift = None, heigth_shift = None): # width_shift = [-x, +x, step]
         self.width_shift = range(width_shift[0], width_shift[1], width_shift[2]).__iter__() if width_shift else None
@@ -205,8 +216,9 @@ class ImageGen:
         return self
 
     def __next__(self):
-        tx = next(self.width_shift)
-        ty = next(self.heigth_shift)
+        # yield transformed images
+        tx = next(self.width_shift) if self.width_shift else 0
+        ty = next(self.heigth_shift) if self.heigth_shift else 0
         itx = randint(0, 1)
         ity = randint(0,1) if itx == 1 else 1
         rows,cols = self.imgs[0].shape
