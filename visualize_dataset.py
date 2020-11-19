@@ -61,7 +61,7 @@ if argv[1].lower() == 'g':
         axs[3].set_title("X_diff")
         axs[4].set_title("label")
         plt.savefig(global_dir_path + "sample" + str(ind) + ".png")
-
+        plt.close()
 # visualise dataset if it was augmented
 elif argv[1].lower() == 'ga':
     # plot and save global dataset
@@ -84,6 +84,7 @@ elif argv[1].lower() == 'ga':
         axs[3].set_title("X_diff")
         axs[4].set_title("label")
         plt.savefig(global_dir_path + "sample" + str(ind) + ".png")
+        plt.close()
 # local dataset visualization
 else:
     from local_strokegenerator import *
