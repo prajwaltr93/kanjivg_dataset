@@ -14,6 +14,7 @@ import numpy as np
 from bresenhamsalgo import getPoints
 import copy as cp
 from random import randint
+import itertools
 
 # globals
 WIDTH = 100
@@ -203,9 +204,11 @@ class ImageGen:
 
         datagen is a iterator object, with __next__() method, for use in for loop
     '''
-    def __init__(self, width_shift = None, heigth_shift = None): # width_shift = [-x, +x, step]
-        self.width_shift = range(width_shift[0], width_shift[1], width_shift[2]).__iter__() if width_shift else None
-        self.heigth_shift = range(heigth_shift[0], heigth_shift[1], heigth_shift[2]).__iter__() if heigth_shift else None
+    def __init__(self, width_shift = None, height_shift = None): # width_shift = [-x, +x, step]
+        dw = [w for w in range(width_shift[0], width_shift[1], width_shift[2])] if width_shift else []
+        dh = [h for h in range(height_shift[0], height_shift[1], height_shift[2])] if height_shift else []
+        # return all combination of tx, ty
+        self.txty = itertools.product(dw, dh).__iter__()
         # TODO : applying shear transformation
     def flow(self, imgs):
         # images to apply transformation
@@ -217,12 +220,10 @@ class ImageGen:
 
     def __next__(self):
         # yield transformed images
-        tx = next(self.width_shift) if self.width_shift else 0
-        ty = next(self.heigth_shift) if self.heigth_shift else 0
-        itx = randint(0, 1)
-        ity = randint(0,1) if itx == 1 else 1
+        tx, ty = next(self.txty)
+        print(tx, ty)
         rows,cols = self.imgs[0].shape
-        M = np.float32([[1, 0, itx * tx],[0, 1, ity * ty]])
+        M = np.float32([[1, 0, tx],[0, 1, ty]])
         dst_images = []
         for img in self.imgs:
             dst = cv.warpAffine(img,M,(cols,rows))
