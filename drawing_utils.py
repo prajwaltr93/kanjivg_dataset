@@ -205,6 +205,7 @@ class ImageGen:
         datagen is a iterator object, with __next__() method, for use in for loop
     '''
     def __init__(self, width_shift = None, height_shift = None): # width_shift = [-x, +x, step]
+        # TODO : randomise transformations
         dw = [w for w in range(width_shift[0], width_shift[1], width_shift[2])] if width_shift else []
         dh = [h for h in range(height_shift[0], height_shift[1], height_shift[2])] if height_shift else []
         # return all combination of tx, ty
@@ -221,7 +222,6 @@ class ImageGen:
     def __next__(self):
         # yield transformed images
         tx, ty = next(self.txty)
-        print(tx, ty)
         rows,cols = self.imgs[0].shape
         M = np.float32([[1, 0, tx],[0, 1, ty]])
         dst_images = []
