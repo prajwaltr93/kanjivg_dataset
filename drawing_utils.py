@@ -46,6 +46,13 @@ def highlightPoints(points):
 
     return img
 
+def get2DCordinatesGlobal(index):
+    '''
+        convert index of flattened array to index of 2d array ex : 100 * 100 image
+        return x,y
+    '''
+    return (index%HEIGHT, index//WIDTH)
+
 def parsePointString(point_string):
     #get x and y cordinate out of point_string
     result_points = points_re.search(point_string)
@@ -205,18 +212,28 @@ class ImageGen:
         datagen is a iterator object, with __next__() method, for use in for loop
     '''
     def __init__(self, width_shift = None, height_shift = None): # width_shift = [-x, +x, step]
-        dw = [w for w in range(width_shift[0], width_shift[1], width_shift[2])] if width_shift else [0]
-        dh = [h for h in range(height_shift[0], height_shift[1], height_shift[2])] if height_shift else [0]
-        # return all combination of tx, ty
-        combo = list(itertools.product(dw, dh))
-        # remove (0, 0) from list, default transformation
-        combo.remove((0, 0))
-        shuffle(combo) # randomise combinations
-        self.txty = combo.__iter__() # return object with __next__() method
-        # TODO : applying shear transformation
+        self.dw = [w for w in range(width_shift[0], width_shift[1], width_shift[2])] if width_shift else [0]
+        self.dh = [h for h in range(height_shift[0], height_shift[1], height_shift[2])] if height_shift else [0]
+
     def flow(self, imgs):
         # images to apply transformation
         self.imgs = imgs
+        # return all combination of tx, ty
+        combo = list(itertools.product(self.dw, self.dh))
+        # remove (0, 0) from list, default transformation
+        combo.remove((0, 0))
+        # check if any given tansorformation can be performed without crossing frame for x_label, x_loc
+        point_xloc = get2DCordinatesGlobal(np.argmax(np.reshape(imgs[2], imgs[2].shape[0] * imgs[2].shape[0])))
+        point_xlabel = get2DCordinatesGlobal(np.argmax(np.reshape(imgs[4], imgs[4].shape[0] * imgs[4].shape[0])))
+        # test every combination
+        res_combo = []
+        for txty in combo:
+            x, y = txty
+            if((point_xloc[0] + x) >= 0 and (point_xloc[0] + x) < HEIGHT and (point_xloc[1] + y) >= 0 and (point_xloc[1] + y) < WIDTH and (point_xlabel[0] + x) >= 0 and (point_xlabel[0] + x) < HEIGHT and (point_xlabel[1] + y) >= 0 and (point_xlabel[1] + y) < WIDTH):
+                res_combo.append(txty)
+        shuffle(res_combo) # randomise combinations
+        self.txty = res_combo.__iter__() # object with __next__() method
+        # TODO : applying shear transformation
 
     def __iter__(self):
         # return iterator object with __next__() method

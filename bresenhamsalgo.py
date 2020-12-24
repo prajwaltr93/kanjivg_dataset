@@ -7,7 +7,7 @@
     given two points generates intermediate points with range +2, -2
 '''
 
-def getPoints(x0, y0,x1, y1):
+def getPoints(x0, y0, x1, y1):
     point_list = [] # final point list to return
 
     # if slope is negative
