@@ -210,6 +210,8 @@ class ImageGen:
         datagen.flow(imgs) # imgs is list of images to apply transformations on, all images should have same dimensions
 
         datagen is a iterator object, with __next__() method, for use in for loop
+
+        this class should only be used for training global model
     '''
     def __init__(self, width_shift = None, height_shift = None): # width_shift = [-x, +x, step]
         self.dw = [w for w in range(width_shift[0], width_shift[1], width_shift[2])] if width_shift else [0]
