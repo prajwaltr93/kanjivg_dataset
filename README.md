@@ -24,7 +24,7 @@ Local Dataset
 
 1.**bresenhamsalgo.py** --> this module has implementation for segmenting a given straight line into point with interval in range of +-2
 
-2.**drawing_utils.py** --> module with most used functions for drawing strokes
+2.**drawing_utils.py** --> module with most used functions for drawing strokes, and class for custom data augmentation.
 
 3.**extract_kanjivg.py** --> converts characters defined in bezeir curves into characters with simple line segments Mc to ML
 
