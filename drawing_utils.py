@@ -4,7 +4,7 @@
 #comments :
 
 '''
-    simple module with some basic drawing functions and user defined datatypes ex : class Point
+    simple module with some basic drawing functions and user defined datatypes ex : Point and ImageGen
 '''
 
 import cv2 as cv
@@ -23,7 +23,8 @@ COLOR = 1
 crop_img_size = 5
 THICKNESS = 1
 LINE_TYPE = cv.LINE_AA
-path_re = re.compile(r'\t(.*)\n')
+path_re = re.compile(r"<path.*=\s'\s(.*)\s'.*/>")
+command_re = re.compile(r"([M,L]\s\d+,\s\d+)")
 points_re = re.compile(r'(\d+),\s(\d+)')
 test_dir_path = "./test_dir/"
 TEST = 2
@@ -85,10 +86,23 @@ def drawStroke(strokes):
                 L 32,32
                 L 14,14
         parse stroke and generate corresponding image
-
         if stroke == None
             generate empty image
         returns numpy representation of images
+    '''
+    img = np.zeros((HEIGHT,WIDTH))
+    if len(strokes) == 0:
+        #generate empty image
+        return img
+    #X_last X_env X_diff
+    for stroke in strokes:
+        for ind in range(len(stroke) - 1):
+            cv.line(img, stroke[ind], stroke[ind+1],COLOR,THICKNESS,LINE_TYPE)
+    return img
+
+def drawStrokeL(strokes):
+    '''
+        given an stroke ex : MLL find m indices and draw stroke to image and return
     '''
     img = np.zeros((HEIGHT,WIDTH))
     if len(strokes) == 0:
@@ -109,11 +123,24 @@ def drawStroke(strokes):
         cv.line(img, parsePointString(slice[ind]), parsePointString(slice[ind+1]),COLOR,THICKNESS,LINE_TYPE)
     return img
 
+def getStrokes(svg_string):
+    '''
+        get all M, L commands and collect index of each M command for global model
+    '''
+    strokes = path_re.findall(svg_string) # get all path elements with d attributes
+    strokes = [list(map(lambda x : (int(x[0]), int(x[1])), points_re.findall(stroke))) for stroke in strokes] # remove svg instruction and retain points and convert them ints
+    return strokes
+
 def getStrokesIndices(svg_string):
     '''
-        get all M, L commands and collect index of each M command
+        get all M, L commands and collect index of each M command for local model
+        # TODO : unify both global and local stroke with common getStrokes function
     '''
-    X_target = path_re.findall(svg_string)
+    strokes = path_re.findall(svg_string) # get all path elements with d attributes
+    X_target = []
+    for stroke in strokes:
+        command = command_re.findall(stroke)
+        X_target += command
     m_indices = []
     for search_ind, path in zip(range(len(X_target)),X_target.__iter__()):
         if path[0] == 'M': # if command begins with M
@@ -188,11 +215,11 @@ class Point:
             self.x = x
             self.y = y
 
-    def updatePoint(self, point_string):
+    def updatePoint(self, points):
         #update X_loc
-        points = parsePointString(point_string)
         self.x = points[0]
         self.y = points[1]
+
     def __str__(self):
         return "X : {} Y : {}\n".format(self.x, self.y)
     def __to_ndarray__():
@@ -206,11 +233,8 @@ class ImageGen:
         Image Generator class, to apply shifting along x and y axis to images
         rough implementation for data augmention of grayscale images
         ex :
-        datagen = ImageGen(width_shift = [-5,5]) # use any one transformation at a time
-        datagen.flow(imgs) # imgs is list of images to apply transformations on, all images should have same dimensions
-
+        datagen = ImageGen(width_shift = [-5,5,1], height_shift = [-5,5,1]),imgs is list of images to apply transformations on, all images should have same dimensions
         datagen is a iterator object, with __next__() method, for use in for loop
-
         this class should only be used for training global model
     '''
     def __init__(self, width_shift = None, height_shift = None): # width_shift = [-x, +x, step]
