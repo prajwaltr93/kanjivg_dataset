@@ -14,8 +14,8 @@ traverse_path = './kanji/'
 offset_x = 4
 offset_y = 4
 out_path = './kanji_modified/'
-m_line = "\tM %d, %d\n"
-l_line = "\tL %d, %d\n"
+m_line = " M %d, %d "
+l_line = " L %d, %d "
 svg_start_line = "<svg xmlns='http://www.w3.org/2000/svg' \nxmlns:xlink='http://www.w3.org/1999/xlink' \n"
 min_x = 0
 min_y = 0
@@ -56,7 +56,6 @@ if __name__ == "__main__":
         # prep output svg file
         write_fd.write(svg_start_line) #write first line
         write_fd.write(f"viewBox = \'{min_x} {min_y} {WIDTH} {HEIGHT}\' >\n")
-        write_fd.write("<path d = '\n")
         d_paths = []
         # findall d paths in svg file
         for line in svg_string:
@@ -68,16 +67,16 @@ if __name__ == "__main__":
         for d in d_paths:
             curve_objects = parse_path(d) # individual curve
             points = [ ]
-
             for curve in curve_objects[1:]: # ignore fist M command
                 t = 0.0
                 for x in range(0,NUM_SEGMENTS): # 0.0 <= t <= 1.0
                     p = curve.point(t)
                     points.append(offset(int(p.real), int(p.imag)))
                     t += step # step
-            # write individual stroke
+            # write individual stroke in terms of path
+            write_fd.write("<path d = '")
             write_stroke(points, write_fd)
+            write_fd.write("' fill='none' stroke='black' />\n")
         # all strokes written
-        write_fd.write("' fill='none' stroke='black' />\n")
         write_fd.write("</svg>")
         write_fd.close()
