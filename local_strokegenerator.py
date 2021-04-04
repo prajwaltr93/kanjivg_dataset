@@ -52,12 +52,12 @@ def strokeGenerator(filelist):
                 diff_stroke = X_target[m_indices[index + 1] : ]
             except:
                 diff_stroke = []
-            env_canvas = drawStroke(env_stroke)
-            diff_canvas = drawStroke(diff_stroke)
+            env_canvas = drawStrokeL(env_stroke)
+            diff_canvas = drawStrokeL(diff_stroke)
             env_l = []
             diff_l = points
             touch = 1
-            con_img = drawStroke(stroke)
+            con_img = drawStrokeL(stroke)
             for ind in range(len(points) - 1):
                 current_xy = points[ind] # crop at this coordinate
                 next_xy = points[ind + 1] # mark at this coordinate
